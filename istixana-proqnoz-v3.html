@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="az"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#176b4d"><title>İstixana Proqnoz Sistemi</title>
+<style>
+:root{--g:#176b4d;--g2:#eaf5ef;--ink:#20302a;--muted:#6c7972;--line:#dce5df;--bg:#f4f7f5;--white:#fff;--orange:#a76519;--red:#a33c36}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:var(--g);color:white;padding:20px max(18px,calc((100% - 980px)/2))}header h1{margin:0;font-size:23px}header p{margin:5px 0 0;color:#dcefe5;font-size:13px}
+main{max-width:980px;margin:20px auto;padding:0 15px 50px}.top{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}.top button,.btn{border:1px solid var(--line);background:white;border-radius:9px;padding:10px 13px;font-weight:650;color:var(--ink);cursor:pointer}.top .primary,.primary{background:var(--g);border-color:var(--g);color:white}.status{margin-left:auto;color:var(--g);font-size:12px;align-self:center}
+.step{display:none}.step.active{display:block}.box{background:white;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:15px}.box h2{margin:0 0 5px;font-size:18px}.sub{color:var(--muted);font-size:13px;margin-bottom:16px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field label{display:block;font-size:12px;font-weight:700;color:#526159;margin-bottom:5px}.field input,.field select{width:100%;padding:11px;border:1px solid #cbd7cf;border-radius:9px;font:inherit;background:white}.hint{background:var(--g2);border-radius:10px;padding:11px 12px;font-size:12px;color:#456056;margin:12px 0}.nav{display:flex;justify-content:space-between;gap:8px;margin-top:10px}.section-list{display:grid;gap:10px}.section-card{border:1px solid var(--line);border-radius:11px;padding:13px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px}.section-card b{display:block}.section-card small{color:var(--muted)}.section-card button{border:0;background:transparent;color:var(--red);cursor:pointer}.choice{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.choice button{text-align:left;border:1px solid var(--line);background:white;border-radius:10px;padding:12px;cursor:pointer}.choice button.on{border:2px solid var(--g);background:var(--g2)}.choice b{display:block}.choice span{font-size:11px;color:var(--muted)}.stage{display:grid;grid-template-columns:1.3fr .7fr .7fr;gap:8px;align-items:end;margin-bottom:9px}.stage-head{font-size:11px;color:var(--muted);font-weight:700}.results{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.result{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px}.result small{color:var(--muted)}.result strong{display:block;font-size:22px;margin-top:3px}.month{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:8px;background:#fff}.monthline{display:flex;justify-content:space-between}.warn{color:var(--orange);font-size:12px}.footer-note{font-size:11px;color:var(--muted);margin-top:12px}.hidden{display:none!important}
+@media(max-width:650px){.grid,.choice,.results{grid-template-columns:1fr 1fr}.stage{grid-template-columns:1fr 1fr}.stage .wide{grid-column:1/-1}}@media(max-width:420px){.grid,.choice,.results{grid-template-columns:1fr}.status{width:100%;margin-left:0}.box{padding:14px}}
+@media print{header{background:white;color:#000}header p{color:#555}.top,.nav,.footer-note{display:none!important}.step{display:block!important}.box{break-inside:avoid}}
+</style></head><body>
+<header><h1>İstixana İxrac Proqnozu</h1><p>Sadə suallar → avtomatik hesab → hazır nəticə</p></header>
+<main>
+<div class="top"><button class="primary" onclick="newInspection()">+ Yeni baxış</button><button onclick="save()">Yadda saxla</button><button onclick="backup()">Backup</button><button onclick="document.getElementById('restore').click()">Backup yüklə</button><input id="restore" type="file" accept=".json" class="hidden"><button onclick="window.print()">Çap / PDF</button><span class="status" id="status">Avtomatik yaddaş aktivdir</span></div>
+
+<div id="s1" class="step active"><section class="box"><h2>1. İstixananı tanıyaq</h2><div class="sub">Əvvəlcə yalnız əsas məlumatları daxil et.</div><div class="grid">
+<div class="field"><label>Təsərrüfat</label><input id="farm" placeholder="Məs: ABC Agro"></div>
+<div class="field"><label>İstixana</label><input id="gh" placeholder="Məs: №2"></div>
+<div class="field"><label>Baxış tarixi</label><input id="inspection" type="date"></div>
+<div class="field"><label>Proqnoz müddəti</label><select id="months"><option value="3">3 ay</option><option value="1">1 ay</option><option value="2">2 ay</option><option value="4">4 ay</option><option value="5">5 ay</option><option value="6">6 ay</option></select></div>
+<div class="field"><label>Müfəttiş</label><input id="inspector"></div>
+<div class="field"><label>Əvvəlki kvota (ton)</label><input id="oldQuota" type="number" min="0" step=".01" value="0"></div>
+<div class="field"><label>Əvvəlki faktiki ixrac (ton)</label><input id="oldExport" type="number" min="0" step=".01" value="0"></div>
+</div><div class="hint">💡 Bir istixanada bir neçə bölmə və bir bölmədə bir neçə sort varsa, hamısını ayrıca əlavə edəcəyik. Sən sadəcə gördüyün məlumatları daxil edəcəksən.</div><div class="nav"><span></span><button class="btn primary" onclick="go(2)">Bölmələrə keç →</button></div></section></div>
+
+<div id="s2" class="step"><section class="box"><h2>2. Bölmələri əlavə et</h2><div class="sub">Hər fərqli sort və ya fərqli inkişaf vəziyyəti üçün ayrıca əlavə et.</div><div id="list" class="section-list"></div><button class="btn primary" style="margin-top:12px" onclick="openEditor()">+ Bölmə əlavə et</button><div class="nav"><button class="btn" onclick="go(1)">← Geri</button><button class="btn primary" onclick="go(4)">Nəticəyə bax →</button></div></section></div>
+
+<div id="editor" class="step"><section class="box"><h2>Yeni bölmə</h2><div class="sub">Burada sahədə baxdığın əsas məlumatları daxil et.</div>
+<div class="grid">
+<div class="field"><label>Bölmə adı / nömrəsi</label><input id="eSection" placeholder="Məs: 1-ci bölmə"></div>
+<div class="field"><label>Bitki / sort</label><input id="eVariety" placeholder="Məs: Pomidor — Torero F1"></div>
+<div class="field"><label>Əkin tarixi</label><input id="ePlantDate" type="date"></div>
+<div class="field"><label>Sahə (m²)</label><input id="eArea" type="number" min="0" step="1"></div>
+<div class="field"><label>Ümumi bitki sayı</label><input id="ePlants" type="number" min="0" step="1"></div>
+<div class="field"><label>Nümunə üçün neçə bitki baxıldı?</label><input id="eSample" type="number" min="1" step="1" value="10"></div>
+</div>
+<div class="hint">🌿 <b>Bic / əlavə filiz:</b> əgər bitkidə əsas gövdədən əlavə saxlanılmış filizlər varsa, aşağıda orta sayını yaz. Yoxdursa <b>1</b> saxla.</div>
+<div class="grid">
+<div class="field"><label>Orta filiz sayı / bitki</label><input id="eShoots" type="number" min="1" step=".1" value="1"></div>
+<div class="field"><label>Əlavə filizlər məhsula daxildirmi?</label><select id="eShootIncluded"><option value="yes">Bəli</option><option value="no">Xeyr</option></select></div>
+</div>
+<div class="hint">🍅 İndi nümunə bitkilərdə gördüyün məhsulu mərhələlər üzrə qeyd et. Çiçəkləri ayrıca yazmaq məcburi deyil — gələcək məhsulu aşağıda ayrıca qiymətləndirə bilərsən.</div>
+<div id="stages"></div>
+<button class="btn" onclick="addStage()">+ Başqa məhsul mərhələsi əlavə et</button>
+<div class="grid" style="margin-top:12px">
+<div class="field"><label>Yaxın məhsuldan orta meyvə çəkisi (q)</label><input id="eWeight" type="number" min="0" step="1" placeholder="Məs: 180"></div>
+<div class="field"><label>Bu meyvələrin proqnoz müddətində yığılacaq payı (%)</label><input id="eShare" type="number" min="0" max="100" step="1" value="100"></div>
+</div>
+<div class="hint">📈 Qarşıdakı aylarda yeni formalaşacaq məhsul ayrıca hesablanır. Əgər əvvəlki yığım məlumatınız varsa, həmin məlumat əsasında tonla yaz; yoxdursa, müfəttiş əsaslandırılmış proqnoz daxil edə bilər.</div>
+<div class="grid">
+<div class="field"><label>Gələcəkdə formalaşacaq məhsul (ton)</label><input id="eFuture" type="number" min="0" step=".01" value="0"></div>
+<div class="field"><label>Təxmini itki (%)</label><input id="eLoss" type="number" min="0" max="100" step="1" value="5"></div>
+<div class="field"><label>İxraca yararlı məhsul (%)</label><input id="eExportShare" type="number" min="0" max="100" step="1" value="90"></div>
+<div class="field"><label>Əlavə qeyd</label><input id="eNote" placeholder="Məs: məhsul yükü güclüdür"></div>
+</div>
+<div class="nav"><button class="btn" onclick="go(2)">← Ləğv et</button><button class="btn primary" onclick="addSection()">Bölməni yadda saxla</button></div>
+</section></div>
+
+<div id="s4" class="step"><section class="box"><h2>3. Nəticə</h2><div class="sub">Sistem bütün bölmələri birləşdirib qarşıdakı müddət üçün ixrac potensialını göstərir.</div><div class="results">
+<div class="result"><small>Sahə</small><strong id="rArea">0 m²</strong></div><div class="result"><small>Bitki</small><strong id="rPlants">0</strong></div><div class="result"><small>Xalis məhsul</small><strong id="rNet">0 t</strong></div><div class="result"><small>İxrac üçün</small><strong id="rExport">0 t</strong></div>
+</div><div class="box" style="padding:12px;margin-top:12px"><b>Əvvəlki kvota</b><div class="monthline"><span>Qalan kvota</span><strong id="rOld">0 t</strong></div><div class="monthline"><span>Bu baxış üzrə yeni potensial</span><strong id="rNew">0 t</strong></div><hr><div class="monthline"><b>Ümumi potensial</b><strong id="rCombined">0 t</strong></div></div>
+<h3 style="font-size:15px;margin-top:20px">Bölmə üzrə nəticələr</h3><div id="details"></div>
+<div class="hint" id="check"></div><div class="nav"><button class="btn" onclick="go(2)">← Bölmələrə qayıt</button><button class="btn primary" onclick="save()">✓ Yadda saxla</button></div></section></div>
+</main>
+<script>
+const $=id=>document.getElementById(id),meta=['farm','gh','inspection','months','inspector','oldQuota','oldExport'];let sections=[],editingStages=[];
+const n=x=>Number(x)||0,fmt=x=>n(x).toLocaleString('az-AZ',{maximumFractionDigits:2});
+function go(x){document.querySelectorAll('.step').forEach(e=>e.classList.remove('active'));$('s'+x)?.classList.add('active');if(x===2)renderList();if(x===4)renderResults();window.scrollTo({top:0,behavior:'smooth'})}
+function openEditor(){editingStages=[{name:'Yetişməkdə olan meyvə',count:0},{name:'Xırda meyvə',count:0}];clearEditor();renderStages();document.querySelectorAll('.step').forEach(e=>e.classList.remove('active'));$('editor').classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+function clearEditor(){['eSection','eVariety','ePlantDate','eArea','ePlants','eSample','eWeight','eFuture','eLoss','eExportShare','eNote'].forEach(id=>$(id).value=id==='eSample'?10:(id==='eLoss'?5:(id==='eExportShare'?90:(id==='eFuture'?0:(id==='eShare'?100:'')))));$('eShoots').value=1;$('eShootIncluded').value='yes'}
+function renderStages(){let box=$('stages');box.innerHTML='<div class="stage-head" style="display:grid;grid-template-columns:1.3fr .7fr .7fr;gap:8px"><span>Mərhələ</span><span>Say / nümunə</span><span>Orta çəki (q)</span></div>';editingStages.forEach((s,i)=>{let d=document.createElement('div');d.className='stage';let a=document.createElement('input');a.value=s.name;a.oninput=()=>s.name=a.value;let b=document.createElement('input');b.type='number';b.min=0;b.step='any';b.value=s.count;b.oninput=()=>s.count=n(b.value);let c=document.createElement('input');c.type='number';c.min=0;c.step='any';c.value=s.weight||'';c.oninput=()=>s.weight=n(c.value);d.append(a,b,c);box.append(d)})}
+function addStage(){editingStages.push({name:'Yeni mərhələ',count:0,weight:0});renderStages()}
+function addSection(){let sample=n($('eSample')),shoots=Math.max(1,n($('eShoots')));sections.push({section:$('eSection').value||('Bölmə '+(sections.length+1)),variety:$('eVariety').value||'—',plantDate:$('ePlantDate').value,area:n($('eArea').value),plants:n($('ePlants').value),sample,shoots,shootIncluded:$('eShootIncluded').value,stages:JSON.parse(JSON.stringify(editingStages)),weight:n($('eWeight').value),share:n($('eShare').value||100),future:n($('eFuture').value),loss:n($('eLoss').value),exportShare:n($('eExportShare').value),note:$('eNote').value});save(false);go(2)}
+function calc(s){let factor=s.sample?Math.max(1,n(s.plants))/s.sample:0;let shootFactor=s.shootIncluded==='yes'?Math.max(1,n(s.shoots)):1;let current=0;s.stages.forEach(x=>current+=n(x.count)*n(x.weight||s.weight)*factor*shootFactor*n(s.share||100)/100);current/=1000000;let gross=current+n(s.future),net=gross*(1-n(s.loss)/100),ex=net*n(s.exportShare)/100;return{current,gross,net,ex}}
+function renderList(){let l=$('list');l.innerHTML='';if(!sections.length){l.innerHTML='<div class="hint">Hələ bölmə əlavə edilməyib. “+ Bölmə əlavə et” düyməsinə bas.</div>';return}sections.forEach((s,i)=>{let c=document.createElement('div');c.className='section-card';let x=calc(s);c.innerHTML='<div><b>'+esc(s.section)+' — '+esc(s.variety)+'</b><small>'+fmt(s.area)+' m² · '+fmt(s.plants)+' bitki · '+fmt(s.shoots)+' filiz/bitki</small></div><div><b>'+fmt(x.ex)+' t</b><button onclick="editSection('+i+')">Düzəlt</button><button onclick="removeSection('+i+')">Sil</button></div>';l.append(c)})}
+function editSection(i){let s=sections[i];openEditor();$('eSection').value=s.section;$('eVariety').value=s.variety;$('ePlantDate').value=s.plantDate;$('eArea').value=s.area;$('ePlants').value=s.plants;$('eSample').value=s.sample;$('eShoots').value=s.shoots;$('eShootIncluded').value=s.shootIncluded||'yes';$('eWeight').value=s.weight;$('eShare').value=s.share;$('eFuture').value=s.future;$('eLoss').value=s.loss;$('eExportShare').value=s.exportShare;$('eNote').value=s.note||'';editingStages=JSON.parse(JSON.stringify(s.stages));renderStages();sections.splice(i,1)}
+function removeSection(i){if(confirm('Bu bölmə silinsin?')){sections.splice(i,1);save();renderList()}}
+function renderResults(){let area=0,p=0,net=0,ex=0;sections.forEach(s=>{area+=s.area;p+=s.plants;let x=calc(s);net+=x.net;ex+=x.ex});$('rArea').textContent=fmt(area)+' m²';$('rPlants').textContent=fmt(p);$('rNet').textContent=fmt(net)+' t';$('rExport').textContent=fmt(ex)+' t';let old=Math.max(0,n($('oldQuota').value)-n($('oldExport').value));$('rOld').textContent=fmt(old)+' t';$('rNew').textContent=fmt(ex)+' t';$('rCombined').textContent=fmt(old+ex)+' t';let d=$('details');d.innerHTML='';sections.forEach(s=>{let x=calc(s),m=document.createElement('div');m.className='month';m.innerHTML='<div class="monthline"><b>'+esc(s.section)+' — '+esc(s.variety)+'</b><strong>'+fmt(x.ex)+' t</strong></div><div class="mini">Hazır/yaxın məhsul: '+fmt(x.current)+' t · Gələcək: '+fmt(s.future)+' t · İtki: '+fmt(s.loss)+'%</div>';d.append(m)});$('check').innerHTML=sections.length?'✓ '+sections.length+' bölmə hesablamaya daxil edilib.':'⚠ Heç bir bölmə əlavə edilməyib.'}
+function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function data(){let m={};meta.forEach(k=>m[k]=$(k).value);return{version:3,meta:m,sections}}
+function save(show=true){try{localStorage.setItem('greenhouseForecastV3',JSON.stringify(data()));if(show)$('status').textContent='Yadda saxlanıldı · '+new Date().toLocaleTimeString('az-AZ',{hour:'2-digit',minute:'2-digit'})}catch(e){}}
+function backup(){download('istixana_proqnozu_backup.json',JSON.stringify(data(),null,2),'application/json')}
+function download(name,text,type){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([text],{type}));a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+function newInspection(){if(confirm('Yeni baxış başlansın? Əvvəlcə backup etmək məsləhətdir.')){sections=[];meta.forEach(k=>$(k).value=['oldQuota','oldExport'].includes(k)?'0':'');$('months').value='3';save();go(1)}}
+$('restore').onchange=async e=>{try{let d=JSON.parse(await e.target.files[0].text());if(!d.meta||!Array.isArray(d.sections))throw 0;meta.forEach(k=>$(k).value=d.meta[k]??'');sections=d.sections;save();go(2)}catch(x){alert('Backup faylı uyğun deyil.')}e.target.value=''};
+try{let d=JSON.parse(localStorage.getItem('greenhouseForecastV3'));if(d){meta.forEach(k=>$(k).value=d.meta?.[k]??'');sections=d.sections||[]}}catch(e){}
+$('inspection').value=$('inspection').value||new Date().toISOString().slice(0,10);
+</script></body></html>
