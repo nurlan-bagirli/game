@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="az"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#166b4c"><title>İstixana İxrac Proqnozu — V4</title>
+<style>
+:root{--green:#166b4c;--green2:#eaf5ef;--dark:#183129;--muted:#6c7b74;--line:#dce6e0;--bg:#f5f7f6;--white:#fff;--danger:#a33c36;--shadow:0 4px 18px rgba(25,55,43,.06)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--dark);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+header{background:var(--green);color:white;padding:22px 18px}header .head{max-width:760px;margin:auto}header h1{font-size:22px;margin:0}header p{margin:5px 0 0;color:#d9eee5;font-size:13px}
+main{max-width:760px;margin:18px auto;padding:0 14px 60px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}.toolbar button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;font-weight:650;color:var(--dark)}.toolbar .mainbtn{background:var(--green);border-color:var(--green);color:#fff}.status{margin-left:auto;align-self:center;font-size:12px;color:var(--green)}
+.progress{display:flex;gap:5px;margin:0 0 15px}.progress div{height:5px;flex:1;border-radius:10px;background:#dfe7e2}.progress div.on{background:var(--green)}
+.screen{display:none}.screen.active{display:block}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:19px;box-shadow:var(--shadow);margin-bottom:14px}.title{font-size:19px;font-weight:750;margin:0}.desc{font-size:13px;color:var(--muted);margin:5px 0 20px}
+.field{margin-bottom:15px}.field:last-child{margin-bottom:0}.field label{display:block;font-size:13px;font-weight:750;margin-bottom:7px}.field .help{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.4}
+input,select,textarea{display:block;width:100%;border:1px solid #cbd8d0;border-radius:11px;background:#fff;padding:13px 12px;font:inherit;color:var(--dark);outline:none}input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px #e6f2ec}textarea{min-height:75px;resize:vertical}
+.section{border:1px solid var(--line);background:#fff;border-radius:14px;padding:15px;margin-bottom:10px}.section .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.section b{font-size:15px}.section small{display:block;color:var(--muted);margin-top:4px;line-height:1.5}.section strong{white-space:nowrap;color:var(--green)}.actions{display:flex;gap:8px;margin-top:10px}.actions button{border:0;background:transparent;color:var(--green);padding:4px 0;font-weight:700}.actions .del{color:var(--danger)}
+.btnrow{display:flex;justify-content:space-between;gap:10px;margin-top:18px}.btn{border:1px solid var(--line);background:#fff;border-radius:11px;padding:12px 15px;font-weight:700;color:var(--dark)}.btn.primary{background:var(--green);border-color:var(--green);color:#fff}.btn.full{width:100%}
+.notice{background:var(--green2);border:1px solid #d6eadf;border-radius:12px;padding:13px;font-size:12px;line-height:1.5;margin:15px 0}.notice b{color:var(--green)}
+.stage{border:1px solid var(--line);border-radius:12px;padding:13px;margin:10px 0;background:#fbfcfb}.stage-title{font-weight:750;margin-bottom:11px}.remove{float:right;border:0;background:none;color:var(--danger);font-weight:700}.add{width:100%;border:1px dashed #aebeb5;background:#fff;border-radius:11px;padding:11px;color:var(--green);font-weight:700}
+.switch{display:flex;align-items:center;gap:10px;border:1px solid var(--line);padding:12px;border-radius:11px}.switch input{width:18px;height:18px;margin:0}
+.results{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metric{border:1px solid var(--line);border-radius:12px;padding:13px;background:#fff}.metric span{display:block;color:var(--muted);font-size:11px}.metric strong{display:block;font-size:20px;margin-top:4px}.big{background:var(--green);color:#fff;border-radius:14px;padding:17px;margin-top:10px}.big span{font-size:12px;color:#dcefe7}.big strong{display:block;font-size:29px;margin-top:3px}.line{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}.line:last-child{border-bottom:0}.empty{text-align:center;color:var(--muted);padding:18px 5px;border:1px dashed #cbd8d0;border-radius:12px}
+.hidden{display:none!important}@media(min-width:650px){.twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px}.twocol .field{margin-bottom:0}.results{grid-template-columns:repeat(4,1fr)}}@media print{header{background:#fff;color:#000;border-bottom:1px solid #ddd}.toolbar,.progress,.btnrow,.actions,.add,.remove{display:none!important}.screen{display:block!important}.card{box-shadow:none;break-inside:avoid}}
+</style></head>
+<body>
+<header><div class="head"><h1>İstixana İxrac Proqnozu</h1><p>İnspektor üçün sadə, ardıcıl və rahat məlumat daxil etmə sistemi</p></div></header>
+<main>
+<div class="toolbar"><button class="mainbtn" onclick="newInspection()">＋ Yeni baxış</button><button onclick="showHistory()">Baxışlar</button><button onclick="save()">Yadda saxla</button><button onclick="backup()">Backup</button><button onclick="document.getElementById('restore').click()">Backup yüklə</button><button onclick="printAll()">Çap / PDF</button><input id="restore" class="hidden" type="file" accept=".json"></div>
+<div class="progress"><div id="p1" class="on"></div><div id="p2"></div><div id="p3"></div></div><div class="status" id="status">Məlumat bu cihazda saxlanılır</div>
+
+<section id="screen1" class="screen active">
+<div class="card"><h2 class="title">1. Baxış məlumatları</h2><p class="desc">Əvvəlcə istixananı və əvvəlki kvotanı qeyd et.</p>
+<div class="field"><label>Təsərrüfatın adı</label><input id="farm" placeholder="Məsələn: ABC Agro"></div>
+<div class="field"><label>İstixananın adı / nömrəsi</label><input id="gh" placeholder="Məsələn: İstixana №2"></div>
+<div class="field"><label>Baxış tarixi</label><input id="inspection" type="date"></div>
+<div class="field"><label>Müfəttiş</label><input id="inspector" placeholder="Ad, soyad"></div>
+<div class="field"><label>Proqnoz müddəti</label><select id="months"><option value="3">3 ay</option><option value="1">1 ay</option><option value="2">2 ay</option><option value="4">4 ay</option><option value="5">5 ay</option><option value="6">6 ay</option></select></div>
+<div class="twocol"><div class="field"><label>Əvvəlki kvota (ton)</label><input id="oldQuota" type="number" min="0" step=".01" value="0"></div><div class="field"><label>Əvvəlki faktiki ixrac (ton)</label><input id="oldExport" type="number" min="0" step=".01" value="0"></div></div>
+<div class="notice">💡 <b>Qayda:</b> fərqli sort, əkin tarixi və ya inkişaf vəziyyəti olan sahələri ayrıca bölmə kimi daxil edəcəyik.</div>
+<button class="btn primary full" onclick="go(2)">Bölmələrə keç →</button>
+</div></section>
+
+<section id="screen2" class="screen">
+<div class="card"><h2 class="title">2. Bölmələri daxil et</h2><p class="desc">İstixananı hissə-hissə qiymətləndir. Hər fərqli sahə ayrıca bölmədir.</p>
+<div id="sectionList"></div>
+<button class="btn primary full" onclick="openEditor()">＋ Bölmə əlavə et</button>
+<div class="btnrow"><button class="btn" onclick="go(1)">← Geri</button><button class="btn primary" onclick="go(3)">Nəticəyə bax →</button></div>
+</div></section>
+
+<section id="editor" class="screen">
+<div class="card"><h2 class="title">Bölmənin məlumatları</h2><p class="desc">Hər xanada yalnız bir məlumat yaz. Aşağı doğru ardıcıl davam et.</p>
+<div class="field"><label>Bölmənin adı / nömrəsi</label><input id="eSection" placeholder="Məsələn: 1-ci bölmə"></div>
+<div class="field"><label>Məhsul növü</label><select id="eCrop" onchange="cropChanged()"><option value="pomidor">🍅 Pomidor</option><option value="xiyar">🥒 Xiyar</option><option value="badimcan">🍆 Badımcan</option><option value="biber">🫑 Bibər</option><option value="diger">🌱 Digər</option></select></div>
+<div class="field"><label>Sort / hibrid</label><input id="eVariety" placeholder="Məsələn: Torero F1"></div>
+<div class="field"><label>Əkin tarixi</label><input id="ePlantDate" type="date"></div>
+<div class="field"><label>Sahə (m²)</label><input id="eArea" type="number" min="0" step="1" placeholder="Məsələn: 1200"></div>
+<div class="field"><label>Ümumi bitki sayı</label><input id="ePlants" type="number" min="0" step="1" placeholder="Məsələn: 8400"></div>
+<div class="field"><label>Nümunə üçün baxılan bitki sayı</label><input id="eSample" type="number" min="1" step="1" value="10"><div class="help">Nümunə sahəni təmsil etməlidir; yalnız ən məhsuldar bitkilər seçilməməlidir.</div></div>
+<div class="field"><label>Nümunə götürmə üsulu</label><select id="eSampling"><option value="başlanğıc-orta-son">Başlanğıc + orta + son</option><option value="sistematik">Sistematik seçim</option><option value="təsadüfi">Təsadüfi seçim</option><option value="digər">Digər</option></select></div>
+
+<div class="notice">🌿 <b>Bic / əlavə filiz:</b> əsas gövdədən əlavə saxlanılmış filiz varsa, orta sayını yaz. Yoxdursa <b>1</b> saxla.</div>
+<div class="field"><label>1 bitkidə orta filiz sayı</label><input id="eShoots" type="number" min="1" step=".1" value="1"></div>
+<div class="field"><label>Əlavə filizlər hesablamaya daxil edilsin?</label><div class="switch"><input id="eShootIncluded" type="checkbox" checked><span>Bəli, əlavə filizlərdəki məhsulu da nəzərə al</span></div></div>
+
+<div class="notice">🍅🥒 <b>Məhsulun vəziyyəti:</b> nümunə bitkilərdə gördüyün məhsulu mərhələ-mərhələ yaz. Hər mərhələ ayrıca blokdur.</div>
+<div class="field"><label>Qiymətləndirmə vahidi</label><select id="eUnit" onchange="unitChanged()"><option value="edəd">Ədəd</option><option value="salxım">Salxım</option></select><div class="help" id="unitHelp">Meyvələri ədəd ilə sayırsansa “Ədəd” seç.</div></div>
+<div id="stages"></div>
+<button class="add" onclick="addStage()">＋ Məhsul mərhələsi əlavə et</button>
+
+<div class="field" style="margin-top:16px"><label>Yaxın məhsul üçün meyvənin orta çəkisi (q)</label><input id="eWeight" type="number" min="0" step="1" placeholder="Məsələn: 180"><div class="help">Mərhələnin öz çəkisi yazılmayıbsa, bu çəki istifadə olunur.</div></div>
+<div class="field"><label>Bu məhsulun proqnoz müddətində yığılacaq payı (%)</label><input id="eShare" type="number" min="0" max="100" step="1" value="100"></div>
+
+<div class="notice">📈 <b>Gələcək məhsul:</b> qarşıdakı dövrdə hələ formalaşacaq məhsulu ayrıca qiymətləndir. Buradakı rəqəm mövcud meyvələrlə üst-üstə düşməməlidir.</div>
+<div class="field"><label>Gələcəkdə formalaşacaq məhsul (ton)</label><input id="eFuture" type="number" min="0" step=".01" value="0"></div>
+<div class="field"><label>Təxmini itki (%)</label><input id="eLoss" type="number" min="0" max="100" step="1" value="5"></div>
+<div class="field"><label>İxraca yararlı məhsul (%)</label><input id="eExportShare" type="number" min="0" max="100" step="1" value="90"></div>
+<div class="field"><label>İnspektor qeydi</label><textarea id="eNote" placeholder="Müşahidə, əsaslandırma və digər qeyd..."></textarea></div>
+<div class="btnrow"><button class="btn" onclick="go(2)">← Ləğv et</button><button class="btn primary" onclick="saveSection()">Bölməni yadda saxla</button></div>
+</div></section>
+
+<section id="history" class="screen"><div class="card"><h2 class="title">Baxış tarixçəsi</h2><p class="desc">Bu cihazda saxlanmış əvvəlki baxışlar.</p><div id="historyList"></div><button class="btn" onclick="go(1)">← Yeni baxışa keç</button></div></section>
+<section id="screen3" class="screen">
+<div class="card"><h2 class="title">3. Nəticə</h2><p class="desc">Hesablanan nəticəni yoxla və baxışı yadda saxla.</p>
+<div class="results"><div class="metric"><span>Sahə</span><strong id="rArea">0 m²</strong></div><div class="metric"><span>Bitki</span><strong id="rPlants">0</strong></div><div class="metric"><span>Xalis məhsul</span><strong id="rNet">0 t</strong></div><div class="metric"><span>Yeni ixrac potensialı</span><strong id="rExport">0 t</strong></div></div>
+<div class="big"><span>Əvvəlki kvotanın qalığı + yeni potensial</span><strong id="rCombined">0 t</strong></div>
+<div class="card" style="padding:14px;margin-top:10px"><div class="line"><span>Əvvəlki kvota</span><b id="rOldQuota">0 t</b></div><div class="line"><span>Əvvəlki faktiki ixrac</span><b id="rOldExport">0 t</b></div><div class="line"><span>Əvvəlki kvotadan qalan</span><b id="rOldRemain">0 t</b></div><div class="line"><span>Bu baxış üzrə yeni potensial</span><b id="rNew">0 t</b></div></div>
+<h3 style="margin:20px 0 9px;font-size:15px">3 aylıq proqnoz</h3><div id="monthly"></div>
+<h3 style="margin:20px 0 9px;font-size:15px">Bölmələr üzrə nəticə</h3><div id="details"></div><h3 style="margin:20px 0 9px;font-size:15px">Hesabın izahı</h3><div id="calcExplain"></div>
+<div class="notice" id="check"></div>
+<div class="btnrow"><button class="btn" onclick="go(2)">← Düzəliş et</button><button class="btn primary" onclick="save()">✓ Yadda saxla</button></div>
+</div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id), meta=['farm','gh','inspection','inspector','months','oldQuota','oldExport'];let sections=[],editingIndex=-1,stages=[];
+const num=x=>Number(x)||0,fmt=x=>num(x).toLocaleString('az-AZ',{maximumFractionDigits:2});
+function go(n){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));let id=n===1?'screen1':n===2?'screen2':'screen3';$(id).classList.add('active');[1,2,3].forEach(i=>$('p'+i).classList.toggle('on',i<=n));if(n===2)renderList();if(n===3)renderResults();scrollTo({top:0,behavior:'smooth'})}
+function resetEditor(){editingIndex=-1;$('eSampling').value='başlanğıc-orta-son';$('eCrop').value='pomidor';$('eUnit').value='edəd';stages=[{name:'Yetişməkdə olan meyvə',count:0,weight:0},{name:'Xırda meyvə',count:0,weight:0}];['eSection','eVariety','ePlantDate','eArea','ePlants','eWeight','eFuture','eNote'].forEach(id=>$(id).value='');$('eSample').value=10;$('eShoots').value=1;$('eShootIncluded').checked=true;$('eShare').value=100;$('eLoss').value=5;$('eExportShare').value=90;renderStages()}
+function openEditor(){resetEditor();cropChanged();showEditor()}
+function cropChanged(){let c=$('eCrop').value, u=$('eUnit');if(c==='pomidor'){u.disabled=false;if(!u.value)u.value='edəd';$('unitHelp').textContent=u.value==='salxım'?'Hər salxımı ayrıca say və 1 salxımın orta çəkisini yaz.':'Meyvələri ədəd ilə say və 1 meyvənin orta çəkisini yaz.'}else{u.value='edəd';u.disabled=true;$('unitHelp').textContent='Bu məhsul üçün qiymətləndirmə vahidi avtomatik olaraq “Ədəd” seçilib.'}renderStages()} 
+function unitChanged(){let u=$('eUnit').value;$('unitHelp').textContent=u==='salxım'?'Hər salxımı ayrıca say və 1 salxımın orta çəkisini yaz.':'Meyvələri ədəd ilə say və 1 meyvənin orta çəkisini yaz.';renderStages()}
+function showEditor(){$('screen1').classList.remove('active');$('screen2').classList.remove('active');$('screen3').classList.remove('active');$('editor').classList.add('active');[1,2,3].forEach(i=>$('p'+i).classList.toggle('on',i<=2));scrollTo({top:0,behavior:'smooth'})}
+function renderStages(){let box=$('stages');box.innerHTML='';let unit=$('eUnit')?.value||'edəd';stages.forEach((s,i)=>{let d=document.createElement('div');d.className='stage';d.innerHTML='<button class="remove" onclick="removeStage('+i+')">Sil</button><div class="stage-title">Məhsul mərhələsi '+(i+1)+'</div><div class="field"><label>Mərhələnin adı</label><input value="'+esc(s.name)+'" placeholder="Məsələn: Yetişməkdə olan meyvə"></div><div class="field"><label>Nümunə bitkilərdə bu mərhələnin sayı ('+unit+')</label><input type="number" min="0" step=".1" value="'+s.count+'"></div><div class="field"><label>'+(unit==='salxım'?'1 salxımın orta çəkisi':'1 meyvənin orta çəkisi')+' (q)</label><input type="number" min="0" step=".1" value="'+(s.weight||'')+'" placeholder="Məsələn: 180"></div>';let ins=d.querySelectorAll('input');ins[0].oninput=e=>s.name=e.target.value;ins[1].oninput=e=>s.count=num(e.target.value);ins[2].oninput=e=>s.weight=num(e.target.value);box.append(d)})}
+function addStage(){stages.push({name:'Yeni mərhələ',count:0,weight:0});renderStages()}
+function removeStage(i){if(stages.length>1){stages.splice(i,1);renderStages()}}
+function readEditor(){return{section:$('eSection').value||('Bölmə '+(sections.length+1)),sampling:$('eSampling').value,crop:$('eCrop').value||'pomidor',unit:$('eUnit').value||'edəd',variety:$('eVariety').value||'—',plantDate:$('ePlantDate').value,area:num($('eArea').value),plants:num($('ePlants').value),sample:num($('eSample').value),shoots:Math.max(1,num($('eShoots').value)),shootIncluded:$('eShootIncluded').checked,stages:JSON.parse(JSON.stringify(stages)),weight:num($('eWeight').value),share:num($('eShare').value||100),future:num($('eFuture').value),loss:num($('eLoss').value),exportShare:num($('eExportShare').value),note:$('eNote').value}}
+function saveSection(){let s=readEditor();if(editingIndex<0)sections.push(s);else sections[editingIndex]=s;save(false);go(2)}
+function editSection(i){let s=sections[i];editingIndex=i;stages=JSON.parse(JSON.stringify(s.stages));$('eSampling').value=s.sampling||'başlanğıc-orta-son';$('eCrop').value=s.crop||'pomidor';$('eUnit').value=s.unit||'edəd';cropChanged();$('eSection').value=s.section;$('eVariety').value=s.variety;$('ePlantDate').value=s.plantDate||'';$('eArea').value=s.area;$('ePlants').value=s.plants;$('eSample').value=s.sample;$('eShoots').value=s.shoots;$('eShootIncluded').checked=s.shootIncluded!==false;$('eWeight').value=s.weight||'';$('eShare').value=s.share;$('eFuture').value=s.future;$('eLoss').value=s.loss;$('eExportShare').value=s.exportShare;$('eNote').value=s.note||'';renderStages();showEditor()}
+function calc(s){let factor=s.sample?num(s.plants)/s.sample:0,shoot=s.shootIncluded?Math.max(1,num(s.shoots)):1,current=0;s.stages.forEach(x=>current+=num(x.count)*num(x.weight||s.weight)*factor*shoot*num(s.share||100)/100);current/=1000000;let gross=current+num(s.future),net=gross*(1-num(s.loss)/100),ex=net*num(s.exportShare)/100;return{current,gross,net,ex}}
+function renderList(){let box=$('sectionList');box.innerHTML='';if(!sections.length){box.innerHTML='<div class="empty">Hələ bölmə əlavə edilməyib.<br>Başlamaq üçün aşağıdakı düyməyə bas.</div>';return}sections.forEach((s,i)=>{let x=calc(s),d=document.createElement('div');d.className='section';d.innerHTML='<div class="row"><div><b>'+esc(s.section)+'</b><small>'+cropName(s.crop)+' · '+esc(s.variety)+'<br>'+fmt(s.area)+' m² · '+fmt(s.plants)+' bitki · '+fmt(s.shoots)+' filiz/bitki</small></div><strong>'+fmt(x.ex)+' t</strong></div><div class="actions"><button onclick="editSection('+i+')">Düzəlt</button><button class="del" onclick="removeSection('+i+')">Sil</button></div>';box.append(d)})}
+function removeSection(i){if(confirm('Bu bölmə silinsin?')){sections.splice(i,1);save();renderList()}}
+function monthSplit(){let months=[0,0,0];sections.forEach(s=>{let x=calc(s),base=x.ex;let shares=s.monthShares||[34,33,33];let total=shares.reduce((a,b)=>a+num(b),0)||100;shares.forEach((v,i)=>months[i]+=base*num(v)/total)});return months}
+function renderResults(){let area=0,p=0,net=0,ex=0;sections.forEach(s=>{area+=s.area;p+=s.plants;let x=calc(s);net+=x.net;ex+=x.ex});let oq=num($('oldQuota').value),oe=num($('oldExport').value),remain=Math.max(0,oq-oe);$('rArea').textContent=fmt(area)+' m²';$('rPlants').textContent=fmt(p);$('rNet').textContent=fmt(net)+' t';$('rExport').textContent=fmt(ex)+' t';$('rOldQuota').textContent=fmt(oq)+' t';$('rOldExport').textContent=fmt(oe)+' t';$('rOldRemain').textContent=fmt(remain)+' t';$('rNew').textContent=fmt(ex)+' t';$('rCombined').textContent=fmt(remain+ex)+' t';let mm=monthSplit();$('monthly').innerHTML=mm.map((v,i)=>'<div class="section"><div class="row"><div><b>'+(i+1)+'. ay</b><small>Gözlənilən ixrac potensialı</small></div><strong>'+fmt(v)+' t</strong></div></div>').join('');let d=$('details');d.innerHTML='';sections.forEach(s=>{let x=calc(s),m=document.createElement('div');m.className='section';m.innerHTML='<div class="row"><div><b>'+esc(s.section)+' — '+cropName(s.crop)+' — '+esc(s.variety)+'</b><small>Yaxın məhsul: '+fmt(x.current)+' t<br>Gələcək məhsul: '+fmt(s.future)+' t<br>Xalis məhsul: '+fmt(x.net)+' t</small></div><strong>'+fmt(x.ex)+' t</strong></div>';d.append(m)});$('calcExplain').innerHTML=sections.length?sections.map(s=>{let x=calc(s),u=s.unit==='salxım'?'salxım':'ədəd',line=s.stages.map(z=>fmt(z.count)+' '+u+' × '+fmt(z.weight||s.weight)+' q').join(' + ');return '<div class="section"><b>'+esc(s.section)+' — '+cropName(s.crop)+'</b><small>Nümunə: '+fmt(s.sample)+' bitki · üsul: '+esc(s.sampling||'—')+'<br>'+line+' → mövcud/yaxın məhsul: '+fmt(x.current)+' t<br>Gələcək məhsul: '+fmt(s.future)+' t → itkidən sonra: '+fmt(x.net)+' t → ixrac potensialı: <b>'+fmt(x.ex)+' t</b></small></div>'}).join(''):'<div class="empty">Hesab izahı üçün əvvəlcə bölmə əlavə et.</div>';$('check').innerHTML=sections.length?'✓ '+sections.length+' bölmə hesablamaya daxil edilib.':'⚠ Bölmə əlavə edilməyib.'}
+function data(){let m={};meta.forEach(k=>m[k]=$(k).value);return{version:6,meta:m,sections}}
+function showHistory(){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$('history').classList.add('active');[1,2,3].forEach(i=>$('p'+i).classList.remove('on'));renderHistory();scrollTo({top:0,behavior:'smooth'})}
+function renderHistory(){let arr=[];try{arr=JSON.parse(localStorage.getItem('greenhouseHistoryV6')||'[]')}catch(e){}let box=$('historyList');if(!arr.length){box.innerHTML='<div class="empty">Hələ saxlanmış baxış yoxdur.</div>';return}box.innerHTML=arr.map((d,i)=>'<div class="section"><div class="row"><div><b>'+esc(d.meta?.farm||'Adsız təsərrüfat')+' — '+esc(d.meta?.gh||'İstixana')+'</b><small>'+esc(d.meta?.inspection||'')+' · '+fmt((d.sections||[]).length)+' bölmə</small></div><strong>'+fmt(totalExport(d.sections||[]))+' t</strong></div><div class="actions"><button onclick="loadHistory('+i+')">Aç</button><button class="del" onclick="deleteHistory('+i+')">Sil</button></div></div>').join('')}
+function totalExport(ss){return ss.reduce((a,s)=>a+calc(s).ex,0)}
+function loadHistory(i){let arr=JSON.parse(localStorage.getItem('greenhouseHistoryV6')||'[]'),d=arr[i];if(!d)return;meta.forEach(k=>$(k).value=d.meta?.[k]??'');sections=d.sections||[];save(false);go(3)}
+function deleteHistory(i){let arr=JSON.parse(localStorage.getItem('greenhouseHistoryV6')||'[]');if(confirm('Bu baxış tarixçədən silinsin?')){arr.splice(i,1);localStorage.setItem('greenhouseHistoryV6',JSON.stringify(arr));renderHistory()}}
+function save(show=true){try{localStorage.setItem('greenhouseForecastV6',JSON.stringify(data()));let arr=JSON.parse(localStorage.getItem('greenhouseHistoryV6')||'[]');let d=data();let key=(d.meta.inspection||'')+'|'+(d.meta.farm||'')+'|'+(d.meta.gh||'');let ix=arr.findIndex(x=>(x.meta?.inspection||'')+'|'+(x.meta?.farm||'')+'|'+(x.meta?.gh||'')===key);if(ix>=0)arr[ix]=d;else arr.unshift(d);arr=arr.slice(0,50);localStorage.setItem('greenhouseHistoryV6',JSON.stringify(arr));if(show)$('status').textContent='Yadda saxlanıldı · '+new Date().toLocaleTimeString('az-AZ',{hour:'2-digit',minute:'2-digit'})}catch(e){}}
+function backup(){download('istixana_proqnozu_backup_v4.json',JSON.stringify(data(),null,2),'application/json')}
+function download(name,text,type){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([text],{type}));a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+function printAll(){renderResults();document.querySelectorAll('.screen').forEach(x=>x.classList.add('active'));window.print();setTimeout(()=>{document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$('screen3').classList.add('active')},100)}
+function newInspection(){if(confirm('Yeni baxış başlansın? Mövcud məlumatı əvvəlcə backup edə bilərsən.')){sections=[];meta.forEach(k=>$(k).value=['oldQuota','oldExport'].includes(k)?'0':'');$('months').value='3';save();go(1)}}
+$('restore').onchange=async e=>{try{let d=JSON.parse(await e.target.files[0].text());if(!d.meta||!Array.isArray(d.sections))throw 0;meta.forEach(k=>$(k).value=d.meta[k]??'');sections=d.sections;save();go(2)}catch(x){alert('Backup faylı uyğun deyil.')}e.target.value=''};
+function cropName(c){return ({pomidor:'🍅 Pomidor',xiyar:'🥒 Xiyar',badimcan:'🍆 Badımcan',biber:'🫑 Bibər',diger:'🌱 Digər'}[c]||'🌱 Digər')}function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+try{let d=JSON.parse(localStorage.getItem('greenhouseForecastV6'));if(d){meta.forEach(k=>$(k).value=d.meta?.[k]??'');sections=d.sections||[]}}catch(e){}
+$('inspection').value=$('inspection').value||new Date().toISOString().slice(0,10);
+resetEditor();
+</script></body></html>
